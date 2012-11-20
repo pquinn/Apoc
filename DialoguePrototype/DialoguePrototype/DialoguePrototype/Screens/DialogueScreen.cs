@@ -468,9 +468,9 @@ namespace DialoguePrototype
             {
                 Vector2 size = spriteFont.MeasureString(word);
 
-                if (word.Equals("\n") || word.Equals("\n\n"))
+                if (word.Contains("\\n"))
                 {
-                    lineWidth = size.X + spaceWidth;
+                    lineWidth = 0;
                 }
 
                 if (lineWidth + size.X < maxLineWidth)
@@ -483,21 +483,10 @@ namespace DialoguePrototype
                     sb.Append("\n" + word + " ");
                     lineWidth = size.X + spaceWidth;
                 }
-
-                //if (word.Equals(@"\\n") || word.Equals(@"\n"))
-                //{
-                //    sb.Append("\n" + " ");
-                //}
             }
 
-            sb.Replace("\\n", " \n ");
-
-            //words = text.Split(' ');
-            //float lineWidth = 0f;
-            //float spaceWidth = spriteFont.MeasureString(" ").X;
-
-            //sb.Replace(@"\\n", @"\n");
-            var ret = sb.ToString();//.Replace(@"\\n", @"\n");
+            sb.Replace("\\n", "\n");
+            var ret = sb.ToString();
             return ret;
         }
 
