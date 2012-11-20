@@ -462,13 +462,15 @@ namespace DialoguePrototype
             float lineWidth = 0f;
             float spaceWidth = spriteFont.MeasureString(" ").X;
 
+            text.Replace("\n", " \n ");
+
             foreach (string word in words)
             {
                 Vector2 size = spriteFont.MeasureString(word);
 
-                if (word.Equals("\n"))
+                if (word.Equals("\n") || word.Equals("\n\n"))
                 {
-                   sb.Append("\n");
+                    lineWidth = size.X + spaceWidth;
                 }
 
                 if (lineWidth + size.X < maxLineWidth)
@@ -481,9 +483,22 @@ namespace DialoguePrototype
                     sb.Append("\n" + word + " ");
                     lineWidth = size.X + spaceWidth;
                 }
+
+                //if (word.Equals(@"\\n") || word.Equals(@"\n"))
+                //{
+                //    sb.Append("\n" + " ");
+                //}
             }
 
-            return sb.ToString();
+            sb.Replace("\\n", " \n ");
+
+            //words = text.Split(' ');
+            //float lineWidth = 0f;
+            //float spaceWidth = spriteFont.MeasureString(" ").X;
+
+            //sb.Replace(@"\\n", @"\n");
+            var ret = sb.ToString();//.Replace(@"\\n", @"\n");
+            return ret;
         }
 
         #endregion
