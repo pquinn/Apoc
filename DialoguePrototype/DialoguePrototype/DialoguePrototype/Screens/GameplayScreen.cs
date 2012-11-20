@@ -207,7 +207,7 @@ namespace DialoguePrototype
             }
             else if (startAction.Evaluate(input, ControllingPlayer, out player))
             {
-                ScreenManager.AddScreen(DialogueScreen.InitializeDialogueBox(new Guid("4cf17838-279c-11e2-b64d-109adda800ea")), null);
+                ScreenManager.AddScreen(DialogueScreen.InitializeDialogueBox(new Guid("129cfb6c-32de-11e2-8539-109adda800ea")), null);
             }
         }
 

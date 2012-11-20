@@ -18,8 +18,8 @@ namespace DialoguePrototype
         /// <summary>
         /// Horizontal and Vertical padding
         /// </summary>
-        const int hPad = 32;
-        const int vPad = 16;
+        public const int hPad = 32;
+        public const int vPad = 16;
 
         /// <summary>
         /// The scale of the text in the prompt.
@@ -39,7 +39,7 @@ namespace DialoguePrototype
         /// <summary>
         /// The current <see cref="NPCPrompt"/>NPCPrompt</see> that will be displayed.
         /// </summary>
-        NPCPrompt prompt;
+        Entry prompt;
 
         /// <summary>
         /// The list of possible player <see cref="Response"/>Responses</see>.
@@ -73,7 +73,7 @@ namespace DialoguePrototype
         /// <summary>
         /// Gets the <see cref="NPCPrompt"/>NPCPrompt</see> contained in this DialogueScreen.
         /// </summary>
-        public NPCPrompt Prompt
+        public Entry Prompt
         {
             get { return prompt; }
         }
@@ -100,7 +100,7 @@ namespace DialoguePrototype
             : base()
         {
             this.scale = 0.75f;
-            this.prompt = FindPrompt(id);
+            this.prompt = FindEntry(id);
             this.responses = new List<Response>();
             IsPopup = false;
             InitializeActions();
@@ -140,19 +140,7 @@ namespace DialoguePrototype
         public static DialogueScreen InitializeDialogueBox(Guid id)
         {
             DialogueScreen openingPrompt = new DialogueScreen(id);
-            if (openingPrompt.Prompt.ResponseRequired)
-            {
-                openingPrompt.Responses = openingPrompt.FindResponses(id);
-            }
-            else
-            {
-                openingPrompt.Prompt.IncludeUsageText();
-            }
-
-            foreach (IDialogueAction action in openingPrompt.Prompt.PromptActions)
-            {
-                action.ExecuteAction();
-            }
+            openingPrompt.Responses = openingPrompt.FindResponses(id);
             return openingPrompt;
         }
 
@@ -181,39 +169,18 @@ namespace DialoguePrototype
         /// </summary>
         /// <param name="id">The GUID of the <see cref="NPCPrompt"/>NPCPrompt</see></param>
         /// <returns>The <see cref="NPCPrompt"/>NPCPrompt</see></returns>
-        private NPCPrompt FindPrompt(Guid id)
+        private Entry FindEntry(Guid id)
         {
-            List<IDialogueAction> promptActions = new List<IDialogueAction>();
             try
             {
                 DataTable entry;
-                String query = "select speaker \"speaker\", entry \"entry\", ";
-                query += "animation \"animation\", sound \"sound\", quest \"quest\", ";
-                query += "response_required \"response\" ";
-                query += "from Prompt where id = \"" + id.ToString() + "\";";
+                String query = "select Body \"Body\" ";
+                query += "from Entry where id = \"" + id.ToString() + "\";";
                 entry = StarterGame.Instance.database.GetDataTable(query);
                 // only take the first result (there should only be one anyway)
                 DataRow result = entry.Rows[0];
-                String speaker = (String)result["speaker"];
-                String body = (String)result["entry"];
-
-                if (!DBNull.Value.Equals(result["animation"]))
-                {
-                    promptActions.Add(new AnimationAction((String)result["animation"]));
-                }
-
-                if (!DBNull.Value.Equals(result["sound"]))
-                {
-                    promptActions.Add(new SoundAction((String)result["sound"]));
-                }
-
-                if (!DBNull.Value.Equals(result["quest"]))
-                {
-                    promptActions.Add(new QuestAction((String)result["quest"]));
-                }
-
-                Boolean responseRequired = (Boolean)result["response"];
-                NPCPrompt prompt = new NPCPrompt(id, speaker, body, promptActions, responseRequired);
+                String body = (String)result["Body"];
+                Entry prompt = new Entry(id, body);
                 return prompt;
 
             }
@@ -222,7 +189,7 @@ namespace DialoguePrototype
                 String error = "The following error has occurred:\n";
                 error += e.Message.ToString() + "\n";
                 Console.WriteLine(error);
-                return new NPCPrompt(id, "error", error, promptActions, false);
+                return new Entry(id, error);
             }
         }
 
@@ -236,14 +203,14 @@ namespace DialoguePrototype
             try
             {
                 DataTable entry;
-                String query = "select entry \"entry\", ";
-                query += "next_entry \"next_entry\" ";
+                String query = "select Body \"Body\", ";
+                query += "Next_ID \"Next_ID\" ";
                 query += "from Response where ID = \"" + id.ToString() + "\";";
                 entry = StarterGame.Instance.database.GetDataTable(query);
                 // again, there should only be one result
                 DataRow result = entry.Rows[0];
-                String entryText = (String)result["entry"];
-                Guid nextEntry = new Guid((String)result["next_entry"]);
+                String entryText = (String)result["Body"];
+                Guid nextEntry = new Guid((String)result["Next_ID"]);
                 return new Response(entryText, nextEntry);
             }
             catch (Exception e)
@@ -267,8 +234,8 @@ namespace DialoguePrototype
             try
             {
                 DataTable entry;
-                String query = "select toID \"to\" ";
-                query += "from Response_Map where fromID = \"" + id.ToString() + "\";";
+                String query = "select Response_ID \"to\" ";
+                query += "from Response_Map where Entry_ID = \"" + id.ToString() + "\";";
                 entry = StarterGame.Instance.database.GetDataTable(query);
                 foreach (DataRow r in entry.Rows)
                 {
@@ -488,7 +455,7 @@ namespace DialoguePrototype
         /// <param name="text">the text to be wrapped</param>
         /// <param name="maxLineWidth">the max width of the line</param>
         /// <returns>the text with the line breaks in it</returns>
-        private String WrapText(SpriteFont spriteFont, string text, float maxLineWidth)
+        public String WrapText(SpriteFont spriteFont, string text, float maxLineWidth)
         {
             String[] words = text.Split(' ');
             StringBuilder sb = new StringBuilder();
@@ -498,6 +465,11 @@ namespace DialoguePrototype
             foreach (string word in words)
             {
                 Vector2 size = spriteFont.MeasureString(word);
+
+                if (word.Equals("\n"))
+                {
+                   sb.Append("\n");
+                }
 
                 if (lineWidth + size.X < maxLineWidth)
                 {

@@ -178,6 +178,9 @@ namespace DialoguePrototype
 
             Vector2 origin = new Vector2(0, font.LineSpacing / 2);
 
+            String wrapped = screen.WrapText(font, displayText,
+            screenManager.GraphicsDevice.Viewport.Width - (DialogueScreen.hPad * 3));
+
             spriteBatch.DrawString(font, displayText, position, color, 0,
                                    origin, scale, SpriteEffects.None, 0);
         }

@@ -149,12 +149,6 @@ namespace GameStateManagement
             // assign them to the ResourceManager so we don't have to worry about cleanup.
             frameBuffers = new FrameBuffers(DetailPreference.High, DetailPreference.Medium);
             sceneInterface.ResourceManager.AssignOwnership(frameBuffers);
-
-            // Post console messages letting the user know how to open the SunBurn Editor.
-            sceneInterface.ShowConsole = true;
-            SystemConsole.AddMessage("Welcome to the SunBurn Engine.", 4);
-            SystemConsole.AddMessage("Use an Xbox controller or the W, A, S, D keys to navigate the scene.", 8);
-            SystemConsole.AddMessage("Press F11 to open the SunBurn Editor.", 12);
         }
 
         public void SetupSunburn()
@@ -168,7 +162,6 @@ namespace GameStateManagement
         public override void Initialize()
         {
             base.Initialize();
-
             isInitialized = true;
         }
 

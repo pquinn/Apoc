@@ -19,7 +19,7 @@ namespace DB
         {
             // this seems like it might be extremely slow. not really sure.
             string execPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-            string fileName = Path.Combine(execPath, "DialoguePrototypeTestDB.s3db").Substring(6);
+            string fileName = Path.Combine(execPath, "Rapture.s3db").Substring(6);
             dbConnection = String.Format("Data Source={0}; Version=3", fileName);
         }
 
